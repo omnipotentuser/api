@@ -1,235 +1,114 @@
 asyncapi: 2.3.0
-id: https://github.com/convo/bedrock-api
+id: https://github.com/omnipotentuser/phraze
 defaultContentType: application/json
 info:
-  title: Bedrock API
+  title: Phraze
   version: 0.1.0
   description: |
-    Bedrock is a swiss-army knife acting as an API facade
-    for providing WebRTC applications access to innovative
-    communication paradigms
+    Phraze implements AI for telephony and enabled signaling to clients to grant both way communication between deaf and hearing users
   license:
-    name: Convo Communications LLC
-    url: https://convorelay.com
+    name: MIT
 servers:
-  production:
-    url: bedrock.convorelay.com
-    protocol: wss
-    description: |
-      Production server
-  staging:
-    url: staging.convorelay.com
-    protocol: wss
-    description: |
-      Staging server
-  qa:
-    url: qa.convorelay.com
-    protocol: wss
-    description: |
-      Quality Assurance server
   development:
-    url: dev.convorelay.com
+    url: dev.phraze.com
     protocol: wss
-    description: >
+    description: >-
       Development Server that provides unauthenticated connection for
       development purposes
-    variables:
-      port:
-        enum:
-          - '4000'
-        default: '4000'
 channels:
   /:
     publish:
       summary: Send data to the server using Phoenix channels library
       message:
         oneOf:
-          - $ref: '#/components/messages/call'
-          - $ref: '#/components/messages/accept_call'
-          - $ref: '#/components/messages/decline_call'
-          - $ref: '#/components/messages/end_call'
-          - $ref: '#/components/messages/trickle'
-          - $ref: '#/components/messages/get_ice_servers'
+          - $ref: '#/components/messages/join'
+          - $ref: '#/components/messages/offer_sdk'
+          - $ref: '#/components/messages/candidate'
+          - $ref: '#/components/messages/hangup'
     subscribe:
       summary: Receive data from the server using Phoenix channels library
       message:
         oneOf:
-          - $ref: '#/components/messages/calling'
-          - $ref: '#/components/messages/ringing'
-          - $ref: '#/components/messages/incoming_call'
-          - $ref: '#/components/messages/missed_call'
-          - $ref: '#/components/messages/trickle'
+          - $ref: '#/components/messages/offer'
+          - $ref: '#/components/messages/answer_sdk'
+          - $ref: '#/components/messages/candidate'
+          - $ref: '#/components/messages/ice_servers'
 components:
   messages:
-    call:
+    join:
       description: Begins a call to remote peer through various mechanisms depending on the service
-      payload:
-        $ref: '#/components/schemas/call'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    accept_call:
+    offer_sdk:
       description: Respond to an incoming call by accepting the invitation to join the call session. The local peer then becomes part of a group of peers belonging to the session and can exchange messages to each other.
       payload:
-        $ref: '#/components/schemas/accept_call'
+        $ref: '#/components/schemas/offer_sdk'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    decline_call:
-      description: Rejects an incoming call. This will tell the server to invoke other actions such as going to videomail or continue ringing from other endpoints.
-      payload:
-        $ref: '#/components/schemas/decline_call'
-      x-response:
-        oneOf:
-          - $ref: '#/components/schemas/ok'
-          - $ref: '#/components/schemas/error'
-          - $ref: '#/components/schemas/timeout'
-    end_call:
-      description: Hangs up and leaves the session. If the session consists of two peers then the session ends.
-      payload:
-        $ref: '#/components/schemas/end_call'
-      x-response:
-        oneOf:
-          - $ref: '#/components/schemas/ok'
-          - $ref: '#/components/schemas/error'
-          - $ref: '#/components/schemas/timeout'
-    trickle:
-      description: Sends or receives network information the server broadcasts to peers in the session
-      payload:
-        $ref: '#/components/schemas/trickle'
-      x-response:
-        oneOf:
-          - $ref: '#/components/schemas/ok'
-          - $ref: '#/components/schemas/error'
-          - $ref: '#/components/schemas/timeout'
-    get_ice_servers:
+    candidate:
       description: Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
       payload:
-        $ref: '#/components/schemas/get_ice_servers'
+        $ref: '#/components/schemas/candidate'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    calling:
-      description: An event received from server where it indicates the call is in process
-      payload:
-        $ref: '#/components/schemas/calling'
-    ringing:
+    hangup:
+      description: Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
+      x-response:
+        oneOf:
+          - $ref: '#/components/schemas/ok'
+          - $ref: '#/components/schemas/error'
+          - $ref: '#/components/schemas/timeout'
+    offer:
       description: Notification that the peers received the request and is ringing from their end
+    answer_sdk:
+      summary: Incoming call request from target peer as an invitation to join the session
       payload:
-        $ref: '#/components/schemas/ringing'
-    incoming_call:
-      description: Incoming call request from target peer as an invitation to join the session
+        $ref: '#/components/schemas/answer_sdk'
+    trickle:
+      summary: Receive candidate trickle from target remote peer
       payload:
-        $ref: '#/components/schemas/incoming_call'
-    missed_call:
-      description: Ringing timeout expired. Server informs the peers that the call is ended.
+        $ref: '#/components/schemas/trickle'
+    ice_servers:
+      summary: Ringing timeout expired. Server informs the peers that the call is ended.
       payload:
-        $ref: '#/components/schemas/missed_call'
+        $ref: '#/components/schemas/ice_servers'
   schemas:
-    call:
-      type: object
-      description: >-
-        initiates the call with sdp and room or phone number along with the
-        configs for the call
-      properties:
-        sdp:
-          $ref: '#/components/schemas/sdp'
-        extension:
-          $ref: '#/components/schemas/extension'
-        call_config:
-          $ref: '#/components/schemas/call_config'
-    calling:
+    offer_sdk:
       type: object
       description: >-
         Receive event with empty payload to confirm the client that the call is
         being processed
-    ringing:
-      type: object
-      description: >-
-        Receive event with empty payload to signify other client is prompted for
-        invite to connect
-    incoming_call:
-      type: object
-      description: >-
-        Receive event consisting of the sdp, extension, and caller id to
-        identify the remote agent and the call makeup
       properties:
         sdp:
           $ref: '#/components/schemas/sdp'
-        extension:
-          $ref: '#/components/schemas/extension'
-        caller_id:
-          $ref: '#/components/schemas/caller_id'
-    missed_call:
-      type: object
-      description: >-
-        Receive event consisting of missed call from trying connecting to the
-        extension string
-      properties:
-        extension:
-          $ref: '#/components/schemas/extension'
-        caller_id:
-          $ref: '#/components/schemas/caller_id'
-    accept_call:
-      type: object
-      description: Responds to incoming call event with SDP and call configs
-      properties:
-        sdp:
-          $ref: '#/components/schemas/sdp'
-        call_config:
-          $ref: '#/components/schemas/call_config'
-    decline_call:
-      description: Declines an incoming call request for connection
-    end_call:
-      description: Leave a session
-    trickle:
+    candidate:
       type: string
       description: >-
         A possible network address for candidacy of connection from outside.
         Gets sent to all other agents in the room
-    get_ice_servers:
-      description: >-
-        Receive a list of ICE servers for STUN and TURN of network discovery and
-        penetration, or to relay the media
-      x-response:
-        $ref: '#/components/schemas/ice_servers'
-    extension:
-      type: string
-      description: >-
-        The extension can be a phone number or some other string based label for
-        the agent to call to, be it another deaf user or voice user
-    sdp:
+    answer_sdk:
       type: string
       description: >-
         Information holding the description of the agent pertaining to its
         network, encryption, and media codecs
-    caller_id:
-      type: string
-      description: >-
-        Unique id to identify the agent in the session based on the agent's
-        generated id after login. It has to be an unique id that represents the
-        same agent regardless of socket disconnection or any newly generated id
-        from socket renewals, and only during the season of the agent's login.
-    call_config:
-      type: object
-      description: Carry any key based configs with boolean values
-      examples:
-        - payload: null
-          vco: true
-          announce_vrs: false
-          vri: false
     ice_servers:
       type: object
       properties:
         ice_servers:
           type: array
           description: List of URLs
+          externalDocs:
+            description: Find more info on WebRTC using STUN/TURN servers
+            url: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling'
           items:
             type: object
             description: >-
@@ -237,26 +116,51 @@ components:
               server and of username and credentials if the key is turn
             properties:
               urls:
-                type: array
-                items:
-                  type: string
-                  description: >-
-                    Format of each server address starts with server type, url,
-                    port and optional transport type
-                  pattern: '[stun|turn]:<url>:[1-9]+[\d]*\?transport=[udp|tcp]'
-                  examples:
-                    - payload: null
-                      pattern: turn:stun.bedrock.dev.convorelay.com:443?transport=udp
-                    - payload: null
-                      pattern: stun:stun.bedrock.convorelay.com:5349
+                $ref: '#/components/schemas/urls'
               username:
-                type: string
-                description: >-
-                  Username in conjunction to the credential to authenticate
-                  access to the TURN server
+                default:
+                $ref: '#/components/schemas/username'
               credential:
-                type: string
-                description: Password to authenticate the TURN server access
+                default:
+                $ref: '#/components/schemas/credential'
+    urls:
+      type: array
+      description: Collection of urls in a list
+      items:
+        type: string
+        description: >-
+          Format of each server address starts with server type, url,
+          port and optional transport type
+        pattern: '[stun|turn]:<url>:[1-9]+[\d]*\?transport=[udp|tcp]'
+        examples:
+          - payload: null
+            pattern: turn:stun.bedrock.dev.convorelay.com:443?transport=udp
+          - payload: null
+            pattern: stun:stun.bedrock.convorelay.com:5349
+    username:
+      type: string
+      description: >-
+        Username in conjunction to the credential to authenticate
+        access to the TURN server
+    credential:
+      type: string
+      description: Password to authenticate the TURN server access
+    trickle:
+      type: object
+      properties:
+        peerid:
+          $ref: '#/components/schemas/peerid'
+        candidate:
+          $ref: '#/components/schemas/candidate'
+    sdp:
+      type: string
+      description: >-
+        Information holding the description of the agent pertaining to its
+        network, encryption, and media codecs
+    peerid:
+      type: string
+      description: >-
+        A unique id normally UUID to identify a remote peer
     ok:
       type: string
       description: response message with success from server
