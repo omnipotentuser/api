@@ -22,17 +22,18 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/join'
-          - $ref: '#/components/messages/offer_sdk'
+          - $ref: '#/components/messages/sdk'
           - $ref: '#/components/messages/candidate'
           - $ref: '#/components/messages/hangup'
     subscribe:
       summary: Receive data from the server using Phoenix channels library
       message:
         oneOf:
-          - $ref: '#/components/messages/offer'
-          - $ref: '#/components/messages/answer_sdk'
+          - $ref: '#/components/messages/create_offer'
+          - $ref: '#/components/messages/sdk'
           - $ref: '#/components/messages/candidate'
           - $ref: '#/components/messages/ice_servers'
+          - $ref: '#/components/messages/hangup'
 components:
   messages:
     join:
@@ -42,7 +43,7 @@ components:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    offer_sdk:
+    sdk:
       description: Respond to an incoming call by accepting the invitation to join the call session. The local peer then becomes part of a group of peers belonging to the session and can exchange messages to each other.
       payload:
         $ref: '#/components/schemas/offer_sdk'
@@ -69,25 +70,19 @@ components:
           - $ref: '#/components/schemas/timeout'
     offer:
       description: Notification that the peers received the request and is ringing from their end
-    answer_sdk:
-      summary: Incoming call request from target peer as an invitation to join the session
-      payload:
-        $ref: '#/components/schemas/answer_sdk'
-    trickle:
-      summary: Receive candidate trickle from target remote peer
-      payload:
-        $ref: '#/components/schemas/trickle'
     ice_servers:
       summary: Ringing timeout expired. Server informs the peers that the call is ended.
       payload:
         $ref: '#/components/schemas/ice_servers'
   schemas:
-    offer_sdk:
+    sdk:
       type: object
       description: >-
         Receive event with empty payload to confirm the client that the call is
         being processed
       properties:
+        type:
+          $ref: '#/components/schemas/type'
         sdp:
           $ref: '#/components/schemas/sdp'
     candidate:
@@ -95,11 +90,6 @@ components:
       description: >-
         A possible network address for candidacy of connection from outside.
         Gets sent to all other agents in the room
-    answer_sdk:
-      type: string
-      description: >-
-        Information holding the description of the agent pertaining to its
-        network, encryption, and media codecs
     ice_servers:
       type: object
       properties:
@@ -152,6 +142,13 @@ components:
           $ref: '#/components/schemas/peerid'
         candidate:
           $ref: '#/components/schemas/candidate'
+    type:
+      type: string
+      description: >-
+        The type of SDP format
+      enum:
+      - offer
+      - answer
     sdp:
       type: string
       description: >-
