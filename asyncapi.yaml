@@ -5,8 +5,9 @@ info:
   title: Phraze
   version: 0.1.0
   description: >-
-    Phraze implements AI for telephony and enabled signaling to clients to grant both way communication between deaf and hearing usersIn
-    cases: 
+    Phraze implements AI for telephony and enabled signaling to clients to grant both way communication between deaf and hearing users
+
+    use cases: 
       1. Interpreter available to take call
         phraze puts patron into a hold queue
         phraze seeks next interpreter in queue
