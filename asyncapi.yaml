@@ -129,31 +129,40 @@ channels:
       message:
         oneOf:
           - $ref: '#/components/messages/join'
-          - $ref: '#/components/messages/sdk'
+          - $ref: '#/components/messages/sdp_info'
           - $ref: '#/components/messages/candidate'
+          - $ref: '#/components/messages/accept'
+          - $ref: '#/components/messages/reject'
+          - $ref: '#/components/messages/miss'
           - $ref: '#/components/messages/hangup'
     subscribe:
       summary: Receive data from the server using Phoenix channels library
       message:
         oneOf:
-          - $ref: '#/components/messages/create_offer'
-          - $ref: '#/components/messages/sdk'
+          - $ref: '#/components/messages/sdp_info'
+          - $ref: '#/components/messages/invite'
           - $ref: '#/components/messages/candidate'
           - $ref: '#/components/messages/ice_servers'
+          - $ref: '#/components/messages/accept'
+          - $ref: '#/components/messages/reject'
+          - $ref: '#/components/messages/miss'
+          - $ref: '#/components/messages/status'
           - $ref: '#/components/messages/hangup'
 components:
   messages:
     join:
-      description: Begins a call to remote peer through various mechanisms depending on the service
+      description: Client describes who it is and if any action is needed to initiate the call.
+      payload:
+        $ref: '#/components/schemas/join'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    sdk:
+    sdp_info:
       description: Respond to an incoming call by accepting the invitation to join the call session. The local peer then becomes part of a group of peers belonging to the session and can exchange messages to each other.
       payload:
-        $ref: '#/components/schemas/offer_sdk'
+        $ref: '#/components/schemas/sdp_info'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
@@ -175,14 +184,47 @@ components:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    offer:
-      description: Notification that the peers received the request and is ringing from their end
     ice_servers:
       summary: Ringing timeout expired. Server informs the peers that the call is ended.
       payload:
         $ref: '#/components/schemas/ice_servers'
   schemas:
-    sdk:
+    join:
+      type: object
+      description: >-
+        Describe the agent joining the session. A unique id which is created post-login to uniquely 
+        identify the user among multiple logins. The type of action declares what kind of action is to be 
+        done when joining the session. For an interpreter UA no action needs to be done.
+      properties:
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        action:
+          $ref: '#/components/schemas/action'
+        agent_uuid:
+          $ref: '#/components/schemas/peerid'
+    user_agent:
+      properties:
+        user_type:
+          type: string
+          description: The type of user agent
+          enum:
+          - patron
+          - vri_interpreter
+          - vrs_interpreter
+          - rtt_interpreter
+          - bot
+    action:
+      properties:
+        session_type:
+          type: string
+          description: The type of session to invoke
+          enum:
+          - p2p
+          - vri
+          - vrs
+          - rtt
+          - idle
+    sdp:
       type: object
       description: >-
         Receive event with empty payload to confirm the client that the call is
@@ -264,7 +306,7 @@ components:
     peerid:
       type: string
       description: >-
-        A unique id normally UUID to identify a remote peer
+        A unique id normally UUID to identify an unique peer. 
     ok:
       type: string
       description: response message with success from server
