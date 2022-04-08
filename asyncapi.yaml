@@ -130,7 +130,7 @@ channels:
         oneOf:
           - $ref: '#/components/messages/join'
           - $ref: '#/components/messages/sdp_info'
-          - $ref: '#/components/messages/candidate'
+          - $ref: '#/components/messages/ice_candidate'
           - $ref: '#/components/messages/accept'
           - $ref: '#/components/messages/reject'
           - $ref: '#/components/messages/miss'
@@ -141,7 +141,7 @@ channels:
         oneOf:
           - $ref: '#/components/messages/sdp_info'
           - $ref: '#/components/messages/invite'
-          - $ref: '#/components/messages/candidate'
+          - $ref: '#/components/messages/ice_candidate'
           - $ref: '#/components/messages/ice_servers'
           - $ref: '#/components/messages/accept'
           - $ref: '#/components/messages/reject'
@@ -168,10 +168,42 @@ components:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    candidate:
+    ice_candidate:
       description: Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
       payload:
-        $ref: '#/components/schemas/candidate'
+        $ref: '#/components/schemas/ice_candidate'
+      x-response:
+        oneOf:
+          - $ref: '#/components/schemas/ok'
+          - $ref: '#/components/schemas/error'
+          - $ref: '#/components/schemas/timeout'
+
+    ice_servers:
+      summary: List of urls for stun and turn servers.
+      payload:
+        $ref: '#/components/schemas/ice_servers'
+    accept:
+      summary: Accept invite from remote peer. Server handles the accept message and sends to others based on the destination peer.
+      payload:
+        $ref: '#/components/schemas/accept'
+      x-response:
+        oneOf:
+          - $ref: '#/components/schemas/ok'
+          - $ref: '#/components/schemas/error'
+          - $ref: '#/components/schemas/timeout'
+    reject:
+      summary: Reject invite from remote peer. Server handles the reject message and sends to others based on the destination peer.
+      payload:
+        $ref: '#/components/schemas/reject'
+      x-response:
+        oneOf:
+          - $ref: '#/components/schemas/ok'
+          - $ref: '#/components/schemas/error'
+          - $ref: '#/components/schemas/timeout'
+    miss:
+      summary: Miss invite from remote peer. Server handles the miss message and sends to others based on the destination peer.
+      payload:
+        $ref: '#/components/schemas/miss'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
@@ -184,10 +216,6 @@ components:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-    ice_servers:
-      summary: Ringing timeout expired. Server informs the peers that the call is ended.
-      payload:
-        $ref: '#/components/schemas/ice_servers'
   schemas:
     join:
       type: object
@@ -224,7 +252,7 @@ components:
           - vrs
           - rtt
           - idle
-    sdp:
+    sdp_info:
       type: object
       description: >-
         Receive event with empty payload to confirm the client that the call is
@@ -234,11 +262,22 @@ components:
           $ref: '#/components/schemas/type'
         sdp:
           $ref: '#/components/schemas/sdp'
-    candidate:
-      type: string
+    ice_candidate:
+      type: object
       description: >-
         A possible network address for candidacy of connection from outside.
         Gets sent to all other agents in the room
+      properties:
+        peerid:
+          $ref: '#/components/schemas/peerid'
+        candidate:
+          $ref: '#/components/schemas/candidate'
+        sdpMid:
+          $ref: '#/components/schemas/sdpMid'
+        sdpMLineIndex:
+          $ref: '#/components/schemas/sdpMLineIndex'
+        usernameFragment:
+          $ref: '#/components/schemas/usernameFragment'
     ice_servers:
       type: object
       properties:
@@ -284,13 +323,27 @@ components:
     credential:
       type: string
       description: Password to authenticate the TURN server access
-    trickle:
+    accept:
       type: object
       properties:
-        peerid:
-          $ref: '#/components/schemas/peerid'
-        candidate:
-          $ref: '#/components/schemas/candidate'
+        from_peerid:
+          #ref: '#/components/schemas/peerid'
+        to_peerid:
+          #ref: '#/components/schemas/peerid'
+    reject:
+      type: object
+      properties:
+        from_peerid:
+          #ref: '#/components/schemas/peerid'
+        to_peerid:
+          #ref: '#/components/schemas/peerid'
+    miss:
+      type: object
+      properties:
+        from_peerid:
+          #ref: '#/components/schemas/peerid'
+        to_peerid:
+          #ref: '#/components/schemas/peerid'
     type:
       type: string
       description: >-
