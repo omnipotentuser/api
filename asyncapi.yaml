@@ -151,9 +151,18 @@ channels:
 components:
   messages:
     join:
-      description: Client describes who it is and if any action is needed to initiate the call.
-      payload:
-        $ref: '#/components/schemas/join'
+      type: object
+      description: >-
+        Describe the agent joining the session. A unique id which is created post-login to uniquely 
+        identify the user among multiple logins. The type of action declares what kind of action is to be 
+        done when joining the session. For an interpreter UA no action needs to be done.
+      properties:
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        action:
+          $ref: '#/components/schemas/action'
+        agent_uuid:
+          $ref: '#/components/schemas/peerid'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
@@ -162,16 +171,40 @@ components:
     sdp_info:
       description: Respond to an incoming call by accepting the invitation to join the call session. The local peer then becomes part of a group of peers belonging to the session and can exchange messages to each other.
       payload:
-        $ref: '#/components/schemas/sdp_info'
+        type: object
+        description: >-
+          Receive event with empty payload to confirm the client that the call is
+          being processed
+        properties:
+          type:
+            $ref: '#/components/schemas/type'
+          sdp:
+            $ref: '#/components/schemas/sdp'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
     ice_candidate:
-      description: Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
+      description: >-
+        Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
+      url: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate
       payload:
-        $ref: '#/components/schemas/ice_candidate'
+        type: object
+        description: >-
+          A possible network address for candidacy of connection from outside.
+          Gets sent to all other agents in the room
+        properties:
+          peerid:
+            $ref: '#/components/schemas/peerid'
+          candidate:
+            $ref: '#/components/schemas/candidate'
+          sdpMid:
+            $ref: '#/components/schemas/sdpMid'
+          sdpMLineIndex:
+            $ref: '#/components/schemas/sdpMLineIndex'
+          usernameFragment:
+            $ref: '#/components/schemas/usernameFragment'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
@@ -181,7 +214,28 @@ components:
     ice_servers:
       summary: List of urls for stun and turn servers.
       payload:
-        $ref: '#/components/schemas/ice_servers'
+        type: object
+        properties:
+          ice_servers:
+            type: array
+            description: List of URLs
+            externalDocs:
+              description: Find more info on WebRTC using STUN/TURN servers
+              url: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling'
+            items:
+              type: object
+              description: >-
+                map of list of urls with server application of either of stun turn
+                server and of username and credentials if the key is turn
+              properties:
+                urls:
+                  $ref: '#/components/schemas/urls'
+                username:
+                  default:
+                  $ref: '#/components/schemas/username'
+                credential:
+                  default:
+                  $ref: '#/components/schemas/credential'
     accept:
       summary: Accept invite from remote peer. Server handles the accept message and sends to others based on the destination peer.
       payload:
@@ -217,19 +271,6 @@ components:
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
   schemas:
-    join:
-      type: object
-      description: >-
-        Describe the agent joining the session. A unique id which is created post-login to uniquely 
-        identify the user among multiple logins. The type of action declares what kind of action is to be 
-        done when joining the session. For an interpreter UA no action needs to be done.
-      properties:
-        user_agent:
-          $ref: '#/components/schemas/user_agent'
-        action:
-          $ref: '#/components/schemas/action'
-        agent_uuid:
-          $ref: '#/components/schemas/peerid'
     user_agent:
       properties:
         user_type:
@@ -252,55 +293,6 @@ components:
           - vrs
           - rtt
           - idle
-    sdp_info:
-      type: object
-      description: >-
-        Receive event with empty payload to confirm the client that the call is
-        being processed
-      properties:
-        type:
-          $ref: '#/components/schemas/type'
-        sdp:
-          $ref: '#/components/schemas/sdp'
-    ice_candidate:
-      type: object
-      description: >-
-        A possible network address for candidacy of connection from outside.
-        Gets sent to all other agents in the room
-      properties:
-        peerid:
-          $ref: '#/components/schemas/peerid'
-        candidate:
-          $ref: '#/components/schemas/candidate'
-        sdpMid:
-          $ref: '#/components/schemas/sdpMid'
-        sdpMLineIndex:
-          $ref: '#/components/schemas/sdpMLineIndex'
-        usernameFragment:
-          $ref: '#/components/schemas/usernameFragment'
-    ice_servers:
-      type: object
-      properties:
-        ice_servers:
-          type: array
-          description: List of URLs
-          externalDocs:
-            description: Find more info on WebRTC using STUN/TURN servers
-            url: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling'
-          items:
-            type: object
-            description: >-
-              map of list of urls with server application of either of stun turn
-              server and of username and credentials if the key is turn
-            properties:
-              urls:
-                $ref: '#/components/schemas/urls'
-              username:
-                default:
-                $ref: '#/components/schemas/username'
-              credential:
-                default:
-                $ref: '#/components/schemas/credential'
     urls:
       type: array
       description: Collection of urls in a list
