@@ -3,7 +3,7 @@ id: https://github.com/omnipotentuser/phraze
 defaultContentType: application/json
 info:
   title: Phraze
-  version: 0.1.2
+  version: 0.1.3
   description: >-
     Phraze implements AI for telephony and enabled signaling to clients to grant both way communication between deaf and hearing users
 
