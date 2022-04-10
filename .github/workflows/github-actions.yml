@@ -17,6 +17,7 @@ jobs:
         with:
           template: '@asyncapi/html-template@0.24.8'  #In case of template from npm, because of @ it must be in quotes
           filepath: asyncapi.yaml
+          parameters: baseHref=/test-experiment/ sidebarOrganization=byTags #space separated list of key/values
           output: docs
           
       - name: Deploy GH page
