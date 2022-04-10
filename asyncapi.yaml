@@ -203,11 +203,11 @@ components:
           candidate:
             $ref: '#/components/schemas/candidate'
           sdpMid:
-            $ref: '#/components/schemas/sdpMid'
+            $ref: '#/components/schemas/sdp_mid'
           sdpMLineIndex:
-            $ref: '#/components/schemas/sdpMLineIndex'
+            $ref: '#/components/schemas/sdp_mline_index'
           usernameFragment:
-            $ref: '#/components/schemas/usernameFragment'
+            $ref: '#/components/schemas/username_fragment'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
