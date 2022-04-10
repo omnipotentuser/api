@@ -34,7 +34,7 @@ info:
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
         patron sends sdp to server, etc
 
-      3. Interpreter none available
+      3. Interpreter none available during business hours
         phraze puts patron into a hold queue
         phraze seeks next interpreter in queue
         phraze gets no agent available
@@ -60,7 +60,6 @@ info:
         phraze seeks next interpreter in queue
         phraze pops interpreter out of waiting queue into room
         phraze sends invite to interpreter
-        phraze sends ivr update status to patron
         interpreter responds with invite accepted
         phraze sends ivr update status to patron
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
@@ -103,12 +102,16 @@ info:
         phraze ssends hangup with status 'patron cancel request'
         phraze places interpreter in end of waiting queue
 
-      Patron hangs up during session
+      8. Off hours
+        phraze checks hours policy (preliminary checks)
+        phraze sends ivr update status to patron
+
+     9.  Patron hangs up during session
         patron sends hangup
         phraze sends hangup command to interpreter
         phraze places interpreter in end of waiting queue
 
-      Interpreter hangs up during session
+      10. Interpreter hangs up during session
         interpreter sends hangup
         phraze sends hangup command to patron
         phraze places interpreter in end of waiting queue
@@ -142,7 +145,7 @@ channels:
           - $ref: '#/components/messages/sdp_info'
           - $ref: '#/components/messages/invite'
           - $ref: '#/components/messages/ice_candidate'
-          - $ref: '#/components/messages/ice_servers'
+          - $ref: '#/components/messages/ice_config'
           - $ref: '#/components/messages/accept'
           - $ref: '#/components/messages/reject'
           - $ref: '#/components/messages/miss'
@@ -162,7 +165,7 @@ components:
         action:
           $ref: '#/components/schemas/action'
         agent_uuid:
-          $ref: '#/components/schemas/peerid'
+          $ref: '#/components/schemas/peer_id'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
@@ -195,8 +198,8 @@ components:
           A possible network address for candidacy of connection from outside.
           Gets sent to all other agents in the room
         properties:
-          peerid:
-            $ref: '#/components/schemas/peerid'
+          peer_id:
+            $ref: '#/components/schemas/peer_id'
           candidate:
             $ref: '#/components/schemas/candidate'
           sdpMid:
@@ -210,8 +213,7 @@ components:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
-
-    ice_servers:
+    ice_config:
       summary: List of urls for stun and turn servers.
       payload:
         type: object
@@ -236,6 +238,20 @@ components:
                 credential:
                   default:
                   $ref: '#/components/schemas/credential'
+    status:
+      summary: Server sends status update such as interpreter accepted invite, etc.
+      payload:
+        $ref: '#/components/schemas/status'
+    invite:
+      summary: Sends an invite to an interpreter
+      payload:
+        type: object
+        description: >-
+          Receive event with empty payload to confirm the client that the call is
+          being processed
+        properties:
+          local_agent:
+            $ref: '#/components/schemas/peer_id'
     accept:
       summary: Accept invite from remote peer. Server handles the accept message and sends to others based on the destination peer.
       payload:
@@ -293,6 +309,21 @@ components:
           - vrs
           - rtt
           - idle
+    status:
+      properties:
+        session_type:
+          type: string
+          description: The type of session to invoke
+          enum:
+          - invite_answered
+            busy
+            closed
+            error
+            pool_empty
+            unknown
+        message:
+          type: string
+          description: Information string of the status
     urls:
       type: array
       description: Collection of urls in a list
@@ -318,24 +349,24 @@ components:
     accept:
       type: object
       properties:
-        from_peerid:
-          #ref: '#/components/schemas/peerid'
-        to_peerid:
-          #ref: '#/components/schemas/peerid'
+        from_peer_id:
+          #ref: '#/components/schemas/peer_id'
+        to_peer_id:
+          #ref: '#/components/schemas/peer_id'
     reject:
       type: object
       properties:
-        from_peerid:
-          #ref: '#/components/schemas/peerid'
-        to_peerid:
-          #ref: '#/components/schemas/peerid'
+        from_peer_id:
+          #ref: '#/components/schemas/peer_id'
+        to_peer_id:
+          #ref: '#/components/schemas/peer_id'
     miss:
       type: object
       properties:
-        from_peerid:
-          #ref: '#/components/schemas/peerid'
-        to_peerid:
-          #ref: '#/components/schemas/peerid'
+        from_peer_id:
+          #ref: '#/components/schemas/peer_id'
+        to_peer_id:
+          #ref: '#/components/schemas/peer_id'
     type:
       type: string
       description: >-
@@ -348,7 +379,7 @@ components:
       description: >-
         Information holding the description of the agent pertaining to its
         network, encryption, and media codecs
-    peerid:
+    peer_id:
       type: string
       description: >-
         A unique id normally UUID to identify an unique peer. 
