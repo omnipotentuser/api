@@ -4,7 +4,7 @@ defaultContentType: application/json
 info:
   title: Phraze
   version: 0.1.2
-  description: >-
+  description: |
     Phraze implements AI for telephony and enabled signaling to clients to grant both way communication between deaf and hearing users
 
     use cases: 
@@ -122,7 +122,7 @@ servers:
   development:
     url: dev.phraze.com
     protocol: wss
-    description: >-
+    description: |
       Development Server that provides unauthenticated connection for
       development purposes
 channels:
@@ -160,7 +160,7 @@ components:
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
     sdp_info:
-      description: >-
+      description: |
         Respond to an incoming call by accepting the invitation to join the call session.
         The local peer then becomes part of a group of peers belonging to the session
         and can exchange messages to each other.
@@ -174,7 +174,7 @@ components:
     ice_candidate:
       externalDocs:
         url: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate
-        description: >-
+        description: |
           Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
       payload:
         $ref: '#/components/schemas/ice_candidate'
@@ -196,7 +196,7 @@ components:
               url: 'https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling'
             items:
               type: object
-              description: >-
+              description: |
                 map of list of urls with server application of either of stun turn
                 server and of username and credentials if the key is turn
               properties:
@@ -216,7 +216,7 @@ components:
       summary: Sends an invite to an interpreter
       payload:
         type: object
-        description: >-
+        description: |
           Receive event with empty payload to confirm the client that the call is
           being processed
         properties:
@@ -259,7 +259,7 @@ components:
   schemas:
     join:
       type: object
-      description: >-
+      description: |
         Describe the agent joining the session. A unique id which is created post-login to uniquely 
         identify the user among multiple logins. The type of action declares what kind of action is to be 
         done when joining the session. For an interpreter UA no action needs to be done.
@@ -272,7 +272,7 @@ components:
           $ref: '#/components/schemas/peer_id'
     sdp_info:
       type: object
-      description: >-
+      description: |
         Receive event with empty payload to confirm the client that the call is
         being processed
       properties:
@@ -282,7 +282,7 @@ components:
           $ref: '#/components/schemas/sdp'
     ice_candidate:
       type: object
-      description: >-
+      description: |
         A possible network address for candidacy of connection from outside.
         Gets sent to all other agents in the room
       properties:
@@ -338,7 +338,7 @@ components:
       description: Collection of urls in a list
       items:
         type: string
-        description: >-
+        description: |
           Format of each server address starts with server type, url,
           port and optional transport type
         pattern: '[stun|turn]:<url>:[1-9]+[\d]*\?transport=[udp|tcp]'
@@ -349,7 +349,7 @@ components:
             pattern: stun:stun.bedrock.convorelay.com:5349
     username:
       type: string
-      description: >-
+      description: |
         Username in conjunction to the credential to authenticate
         access to the TURN server
     credential:
@@ -384,24 +384,24 @@ components:
           #ref: '#/components/schemas/peer_id'
     type:
       type: string
-      description: >-
+      description: |
         The type of SDP format
       enum:
       - offer
       - answer
     sdp:
       type: string
-      description: >-
+      description: |
         Information holding the description of the agent pertaining to its
         network, encryption, and media codecs
     candidate:
       type: string
-      description: >-
+      description: |
         A DOMString describing the network connectivity information for the candidate.
         Additional information can be found in RTCIceCandidate.candidate.
     peer_id:
       type: string
-      description: >-
+      description: |
         A unique id normally UUID to identify an unique peer.
               sdpMid:
             $ref: '#/components/schemas/sdpMid'
@@ -411,19 +411,19 @@ components:
             $ref: '#/components/schemas/usernameFragment'
     sdp_mid:
       type: integer
-      description: >-
+      description: |
         A DOMString specifying the candidate's media stream identification tag which uniquely
         identifies the media stream within the component with which the candidate is associated,
         or null if no such association exists
     sdp_mline_index:
       type: integer
-      description: >-
+      description: |
         A number property containing the zero-based index of the m-line with which the candidate
         is associated, within the SDP of the media description, or null if no such associated
         exists. Additional information can be found in RTCIceCandidate.sdpMLineIndex.
     username_fragment:
       type: string
-      description: >-
+      description: |
         A DOMString containing the username fragment (usually referred to in shorthand as "ufrag"
         or "ice-ufrag"). This fragment, along with the ICE password ("ice-pwd"), uniquely identifies
         a single ongoing ICE interaction (including for any communication with the STUN server).
