@@ -379,10 +379,40 @@ components:
       description: >-
         Information holding the description of the agent pertaining to its
         network, encryption, and media codecs
+    candidate:
+      type: string
+      description: >-
+        A DOMString describing the network connectivity information for the candidate.
+        Additional information can be found in RTCIceCandidate.candidate.
     peer_id:
       type: string
       description: >-
-        A unique id normally UUID to identify an unique peer. 
+        A unique id normally UUID to identify an unique peer.
+              sdpMid:
+            $ref: '#/components/schemas/sdpMid'
+          sdpMLineIndex:
+            $ref: '#/components/schemas/sdpMLineIndex'
+          usernameFragment:
+            $ref: '#/components/schemas/usernameFragment'
+    sdp_mid:
+      type: integer
+      description: >-
+        A DOMString specifying the candidate's media stream identification tag which uniquely
+        identifies the media stream within the component with which the candidate is associated,
+        or null if no such association exists
+    sdp_mline_index:
+      type: integer
+      description: >-
+        A number property containing the zero-based index of the m-line with which the candidate
+        is associated, within the SDP of the media description, or null if no such associated
+        exists. Additional information can be found in RTCIceCandidate.sdpMLineIndex.
+    username_fragment:
+      type: string
+      description: >-
+        A DOMString containing the username fragment (usually referred to in shorthand as "ufrag"
+        or "ice-ufrag"). This fragment, along with the ICE password ("ice-pwd"), uniquely identifies
+        a single ongoing ICE interaction (including for any communication with the STUN server).
+        Additional information can be found in RTCIceCandidate.usernameFragment.
     ok:
       type: string
       description: response message with success from server
