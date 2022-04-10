@@ -3,7 +3,7 @@ id: https://github.com/omnipotentuser/phraze
 defaultContentType: application/json
 info:
   title: Phraze
-  version: 0.1.0
+  version: 0.1.1
   description: >-
     Phraze implements AI for telephony and enabled signaling to clients to grant both way communication between deaf and hearing users
 
@@ -128,7 +128,6 @@ servers:
 channels:
   /:
     publish:
-      summary: Send data to the server using Phoenix channels library
       message:
         oneOf:
           - $ref: '#/components/messages/join'
@@ -139,7 +138,6 @@ channels:
           - $ref: '#/components/messages/miss'
           - $ref: '#/components/messages/hangup'
     subscribe:
-      summary: Receive data from the server using Phoenix channels library
       message:
         oneOf:
           - $ref: '#/components/messages/sdp_info'
@@ -154,60 +152,32 @@ channels:
 components:
   messages:
     join:
-      type: object
-      description: >-
-        Describe the agent joining the session. A unique id which is created post-login to uniquely 
-        identify the user among multiple logins. The type of action declares what kind of action is to be 
-        done when joining the session. For an interpreter UA no action needs to be done.
-      properties:
-        user_agent:
-          $ref: '#/components/schemas/user_agent'
-        action:
-          $ref: '#/components/schemas/action'
-        agent_uuid:
-          $ref: '#/components/schemas/peer_id'
+      payload:
+        $ref: '#/components/schemas/join'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
     sdp_info:
-      description: Respond to an incoming call by accepting the invitation to join the call session. The local peer then becomes part of a group of peers belonging to the session and can exchange messages to each other.
+      description: >-
+        Respond to an incoming call by accepting the invitation to join the call session.
+        The local peer then becomes part of a group of peers belonging to the session
+        and can exchange messages to each other.
       payload:
-        type: object
-        description: >-
-          Receive event with empty payload to confirm the client that the call is
-          being processed
-        properties:
-          type:
-            $ref: '#/components/schemas/type'
-          sdp:
-            $ref: '#/components/schemas/sdp'
+        $ref: '#/components/schemas/sdp_info'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
     ice_candidate:
-      description: >-
-        Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
-      url: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate
-      payload:
-        type: object
+      externalDocs:
+        url: https://developer.mozilla.org/en-US/docs/Web/API/RTCIceCandidate
         description: >-
-          A possible network address for candidacy of connection from outside.
-          Gets sent to all other agents in the room
-        properties:
-          peer_id:
-            $ref: '#/components/schemas/peer_id'
-          candidate:
-            $ref: '#/components/schemas/candidate'
-          sdpMid:
-            $ref: '#/components/schemas/sdp_mid'
-          sdpMLineIndex:
-            $ref: '#/components/schemas/sdp_mline_index'
-          usernameFragment:
-            $ref: '#/components/schemas/username_fragment'
+          Server sends a list of uri's consisting of STUN and TURN servers for the peer to insert for ICE
+      payload:
+        $ref: '#/components/schemas/ice_candidate'
       x-response:
         oneOf:
           - $ref: '#/components/schemas/ok'
@@ -287,6 +257,45 @@ components:
           - $ref: '#/components/schemas/error'
           - $ref: '#/components/schemas/timeout'
   schemas:
+    join:
+      type: object
+      description: >-
+        Describe the agent joining the session. A unique id which is created post-login to uniquely 
+        identify the user among multiple logins. The type of action declares what kind of action is to be 
+        done when joining the session. For an interpreter UA no action needs to be done.
+      properties:
+        user_agent:
+          $ref: '#/components/schemas/user_agent'
+        action:
+          $ref: '#/components/schemas/action'
+        agent_uuid:
+          $ref: '#/components/schemas/peer_id'
+    sdp_info:
+      type: object
+      description: >-
+        Receive event with empty payload to confirm the client that the call is
+        being processed
+      properties:
+        type:
+          $ref: '#/components/schemas/type'
+        sdp:
+          $ref: '#/components/schemas/sdp'
+    ice_candidate:
+      type: object
+      description: >-
+        A possible network address for candidacy of connection from outside.
+        Gets sent to all other agents in the room
+      properties:
+        peer_id:
+          $ref: '#/components/schemas/peer_id'
+        candidate:
+          $ref: '#/components/schemas/candidate'
+        sdpMid:
+          $ref: '#/components/schemas/sdp_mid'
+        sdpMLineIndex:
+          $ref: '#/components/schemas/sdp_mline_index'
+        usernameFragment:
+          $ref: '#/components/schemas/username_fragment'
     user_agent:
       properties:
         user_type:
@@ -350,22 +359,28 @@ components:
       type: object
       properties:
         from_peer_id:
+          type: string
           #ref: '#/components/schemas/peer_id'
         to_peer_id:
+          type: string
           #ref: '#/components/schemas/peer_id'
     reject:
       type: object
       properties:
         from_peer_id:
+          type: string
           #ref: '#/components/schemas/peer_id'
         to_peer_id:
+          type: string
           #ref: '#/components/schemas/peer_id'
     miss:
       type: object
       properties:
         from_peer_id:
+          type: string
           #ref: '#/components/schemas/peer_id'
         to_peer_id:
+          type: string
           #ref: '#/components/schemas/peer_id'
     type:
       type: string
