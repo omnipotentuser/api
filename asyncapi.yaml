@@ -1,4 +1,4 @@
-asyncapi: 2.3.0
+asyncapi: 2.2.0
 id: https://github.com/omnipotentuser/phraze
 defaultContentType: application/json
 info:
