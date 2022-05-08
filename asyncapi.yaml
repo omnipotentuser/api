@@ -11,217 +11,122 @@ info:
       1. Interpreter available to take call
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze pops interpreter out of waiting queue into room
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron
-
         interpreter responds with invite accepted
-
         phraze sends ivr update status to patron
-
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
-
         patron sends sdp to server, etc
-
-
 
       2. Interpreter busy
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze gets no agent available
-
         phraze sends IVR update status 'busy' to patron
-
         interpreter becomes available, goes into waiting queue
-
         phraze gets event that interpreter is available
-
         phraze pops interpreter from waiting queue into room
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron 'interpreter received request'
-
         interpreter responds with invite accepted
-
         phraze sends ivr update status to patron
-
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
-
         patron sends sdp to server, etc
-
 
 
       3. Interpreter none available during business hours
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze gets no agent available
-
         phraze checks if any agent is online, but none available
-
         phraze sends IVR update status 'none_avail' to patron
-
         interpreter comes online, is available, goes into waiting queue
-
         phraze gets event that interpreter is available
-
         phraze pops interpreter from waiting queue into room
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron 'interpreter received request'
-
         interpreter responds with invite accepted
-
         phraze sends ivr update status to patron
-
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
-
         patron sends sdp to server, etc
-
-
 
       4. Interpreter Rejects
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron
-
         interpreter responds with reject
-
         phraze puts interpreter into timeout room
-
         phraze seeks next interpreter in queue
-
         phraze pops interpreter out of waiting queue into room
-
         phraze sends invite to interpreter
-
         interpreter responds with invite accepted
-
         phraze sends ivr update status to patron
-
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
-
         patron sends sdp to server, etc
-
 
 
       5. Interpreter Misses
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron
-
         interpreter times out with no response
-
         phraze puts interpreter into timeout room
-
         phraze seeks next interpreter in queue
-
         phraze pops interpreter out of waiting queue into room
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron
-
         interpreter responds with invite accepted
-
         phraze sends ivr update status to patron
-
         patron receives the status update, (may allow customer to manually allow app to begin sending sdp)
-
         patron sends sdp to server, etc
-
-
 
       6. Patron cancels request
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze pops interpreter out of waiting queue into room
-
         phraze sends invite to interpreter
-
         phraze sends ivr update status to patron
-
         patron sends cancel request to phraze
-
         phraze sends cancel to interpreter
-
         phraze places interpreter in end of waiting queue
-
-
 
       7. Patron canels request after interpreter accepts invite
 
         phraze puts patron into a hold queue
-
         phraze seeks next interpreter in queue
-
         phraze pops interpreter out of waiting queue into room
-
         phraze sends invite to interpreter
-
         interpreter accepts invite
-
         phraze sends ivr update status to patron interpreter is ready
-
         patron sends cancel request to phraze
-
         phraze ssends hangup with status 'patron cancel request'
-
         phraze places interpreter in end of waiting queue
-
-
 
       8. Off hours
 
         phraze checks hours policy (preliminary checks)
-
         phraze sends ivr update status to patron
 
-
-
-
-     9.  Patron hangs up during session
+      9.  Patron hangs up during session
 
         patron sends hangup
-
         phraze sends hangup command to interpreter
-
         phraze places interpreter in end of waiting queue
-
 
 
       10. Interpreter hangs up during session
 
         interpreter sends hangup
-
         phraze sends hangup command to patron
-
-
         phraze places interpreter in end of waiting queue
 
 
@@ -235,7 +140,7 @@ servers:
       Development Server that provides unauthenticated connection for
       development purposes
 channels:
-  /:
+  /ws/signaler:
     publish:
       message:
         oneOf:
